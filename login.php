@@ -1,29 +1,23 @@
 <?php
 
 session_start();
-
 require_once 'database/database.php';
+
 $errors = [];
 
 if (isset($_POST['login'])) {
-
     if (! empty($_POST['email']) && ! empty($_POST['password'])) {
 
-        // Verification des informations de connexion
+        // -Vérification des informations de connexion
         $query = 'SELECT * FROM users
-      WHERE (email = 
-      :email OR username = :email)';
+      WHERE (email = :email OR username =:email)';
         $query = $pdo->prepare($query);
-        $query->execute(
-            [
-                'email' => $_POST['email'],
-                'password' => $_POST['password'],
-            ]);
+        $query->execute([
+            'email' => $_POST['email'],
+            'password' => $_POST['password'],
+        ]);
         $user = $query->fetch();
-        //  echo '<pre>';
-        //     print_r($user["password"]);
-        //  echo'</pre>';
-        //  die;
+        // --Si les informations de connexion sont correctes, on crée une session et on redirige vers la page d'accueil de l'admin ou l'utilisateur
 
         if ($user && password_verify($_POST['password'], $user['password'])) {
             $_SESSION['auth'] = $user;
@@ -34,17 +28,17 @@ if (isset($_POST['login'])) {
                 case 'admin':
                     header('Location: admin-dashboard.php');
                     break;
+
                 default:
-                    header('Location: index.php');
+                    header('Location: user-dashboard.php');
                     break;
             }
         } else {
-            $errors['email'] = 'Email ou mot de passe incorrect';
+            $errors['email'] = 'Email ou mot de passe incorrect.';
         }
     } else {
-        $errors['login'] = 'Tous les champs doivent être remplis';
+        $errors['login'] = 'Tous les champs doivent être remplis.';
     }
-
 }
 
 $pageTitle = 'Page  login';
